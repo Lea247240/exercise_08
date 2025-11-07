@@ -43,7 +43,7 @@ for (i in (1:(length(permutation)-1))){
 
 # .......... all function..................................
 FindSorted <- function(permutation){
-  start <- permutation[1]
+  #start <- permutation[1]
   end<- permutation[length(permutation)-1]
   for (i in (1:end)){
     
@@ -130,6 +130,9 @@ IndicateAscending(permutation <- c(0,4,5,3,2,1,6,7,8))
 
 permutation <- c(5,1,4,3,7,8,9,2,6)
 
+# pridani 0 a n+1 
+permutation <- c(0, permutation, length(permutation)+1)
+
 start <- FindSorted(permutation)
 mark <- IndicateAscending(permutation)
 idx_0 <-c()
@@ -148,16 +151,21 @@ small <- min(number)
 our_idx <- match(small,permutation) # get index of smallest value
 
 #change the numbers
-permutation[start] <-  permutation[our_idx] 
-permutation[our_idx]  <- permutation[start]
+permutation[c(start,our_idx)] <- permutation[c(our_idx,start)]
 permutation
+
+permutation[-c(1,length(permutation))]
 
 BreakpointSort <- function(permutation){
   
-  while (TRUE) {
-    start <- FindSorted(permutation)
-    mark <- IndicateAscending(permutation)
-    idx_0 <-c()
+  # create 0 a n+1 
+  permutation <- c(0, permutation, length(permutation)+1)
+  step <- 0
+  
+  while (!all(diff(permutation) == 1)) {  #end case
+    start <- FindSorted(permutation) # position first incorrect sorted number
+    mark <- IndicateAscending(permutation) # find descendant part between numbers == 0
+    idx_0 <-c() # vector with descendant position
     
     for (i in (1:(length(permutation)-1))){
       if (mark[i] == 0){
@@ -166,21 +174,23 @@ BreakpointSort <- function(permutation){
         idx_0 <- c(idx_0,i) # index of 0 in mark
       } 
     }
+    # change position to real number
     number <- permutation[idx_0]
-    
+    # find smallest number
     small <- min(number)
-    
+    # find index of smallest number
     our_idx <- match(small,permutation) # get index of smallest value
     
     #change the numbers
-    permutation[start] <-  permutation[our_idx] 
-    permutation[our_idx]  <- permutation[start]
-    permutation
+    permutation[c(start,our_idx)] <- permutation[c(our_idx,start)]
+    print(permutation)
+    step <- step + 1
     
-    if (all(mark != 0)){
-      return(permutation)
-    }
   }
+  # delete the help numbers
+  permutation[-c(1,length(permutation))]
+  print(step)
+  return(permutation)
 }
 
 BreakpointSort(permutation <- c(5,1,4,3,7,8,9,2,6))
